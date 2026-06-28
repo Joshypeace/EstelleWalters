@@ -5,6 +5,7 @@ import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
 import { Testimonials } from '@/components/sections/testimonials'
 import { CTASection } from '@/components/sections/cta'
+import { VentureJournal } from '@/components/sections/venture-journal'
 import { TeamMembers } from '@/components/sections/team-members'
 import Image from 'next/image'
 
@@ -35,7 +36,7 @@ export default function BilasStudioPage() {
       <Header />
       
       {/* Logo Section */}
-      <section className="py-8 px-4 bg-secondary/20 border-b border-border">
+      <section className="pt-24 pb-8 px-4 bg-secondary/20 border-b border-border">
         <div className="max-w-6xl mx-auto flex justify-center">
           <Image
             src="/logos/bilas-studio.jpg"
@@ -69,32 +70,32 @@ export default function BilasStudioPage() {
           {
             title: 'Hair Styling & Precision Cuts',
             description: 'Expert styling and cutting services tailored to your unique look and lifestyle.',
-            icon: '✂️',
+            icon: 'scissors',
           },
           {
             title: 'Vibrant Hair Coloring',
             description: 'Professional coloring and treatments using premium products for long-lasting results.',
-            icon: '🎨',
+            icon: 'palette',
           },
           {
             title: 'Skin Treatments',
             description: 'Comprehensive skincare and facial treatments for rejuvenation and renewal.',
-            icon: '✨',
+            icon: 'sparkles',
           },
           {
             title: 'Makeup & Nails',
             description: 'Professional makeup application and nail extensions for every occasion.',
-            icon: '💅',
+            icon: 'brush',
           },
           {
             title: 'Spa & Relaxation',
             description: 'Therapeutic spa services designed to restore balance and wellness.',
-            icon: '🧘',
+            icon: 'leaf',
           },
           {
             title: 'Barbing Services',
-            description: 'Precision men\s grooming and barbering by expert technicians.',
-            icon: '💈',
+            description: "Precision men's grooming and barbering by expert technicians.",
+            icon: 'gem',
           },
         ]}
       />
@@ -149,6 +150,8 @@ export default function BilasStudioPage() {
           </div>
         </div>
       </section>
+
+      <VentureJournal ventureSlug="bilas-studio" />
 
       <CTASection />
       <Footer />

@@ -14,6 +14,8 @@ interface PremiumButtonProps {
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
   icon?: ReactNode
+  /** Open href in a new tab as an external link */
+  external?: boolean
 }
 
 export function PremiumButton({
@@ -26,6 +28,7 @@ export function PremiumButton({
   disabled = false,
   type = 'button',
   icon,
+  external = false,
 }: PremiumButtonProps) {
   const baseClasses =
     'inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed'
@@ -59,6 +62,13 @@ export function PremiumButton({
   )
 
   if (href) {
+    if (external) {
+      return (
+        <Link href={href} target="_blank" rel="noopener noreferrer">
+          {content}
+        </Link>
+      )
+    }
     return <Link href={href}>{content}</Link>
   }
 

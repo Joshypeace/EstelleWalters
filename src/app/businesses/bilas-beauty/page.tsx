@@ -7,6 +7,7 @@ import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
 import { Testimonials } from '@/components/sections/testimonials'
 import { CTASection } from '@/components/sections/cta'
+import { VentureJournal } from '@/components/sections/venture-journal'
 import { PhotoGallery } from '@/components/ui/photo-gallery'
 import { SectionHeader } from '@/components/ui/luxury-card'
 import Image from 'next/image'
@@ -25,7 +26,7 @@ export default function BilaBeautyPage() {
       <Header />
 
       {/* Logo Section */}
-      <section className="py-8 px-4 bg-secondary/20 border-b border-border">
+      <section className="pt-24 pb-8 px-4 bg-secondary/20 border-b border-border">
         <div className="max-w-6xl mx-auto flex justify-center">
           <Image src="/logos/bilas-beauty.png" alt="Bilas Beauty Logo" width={120} height={120} className="object-contain" />
         </div>
@@ -43,12 +44,12 @@ export default function BilaBeautyPage() {
       />
       <Services
         services={[
-          { title: 'Cosmetics & Makeup', description: 'Professional-grade cosmetics and makeup essentials for everyday and professional use.', icon: '💄' },
-          { title: 'Hair Care Products', description: 'Premium hair care formulations designed for strength, vitality, and natural beauty.', icon: '💆' },
-          { title: 'Skincare Solutions', description: 'Advanced skincare products addressing all skin types with natural, clean formulations.', icon: '✨' },
-          { title: 'Wholesale & Bulk', description: 'Special wholesale pricing and bulk supplies for salons and beauty professionals.', icon: '📦' },
-          { title: 'Nail & Lash', description: 'Nail extensions, quality lashes, and professional adhesives for flawless finishes.', icon: '💅' },
-          { title: 'Free Shipping', description: 'Complimentary shipping on orders over $99 on all store items.', icon: '🚚' },
+          { title: 'Cosmetics & Makeup', description: 'Professional-grade cosmetics and makeup essentials for everyday and professional use.', icon: 'palette' },
+          { title: 'Hair Care Products', description: 'Premium hair care formulations designed for strength, vitality, and natural beauty.', icon: 'droplet' },
+          { title: 'Skincare Solutions', description: 'Advanced skincare products addressing all skin types with natural, clean formulations.', icon: 'sparkles' },
+          { title: 'Wholesale & Bulk', description: 'Special wholesale pricing and bulk supplies for salons and beauty professionals.', icon: 'package' },
+          { title: 'Nail & Lash', description: 'Nail extensions, quality lashes, and professional adhesives for flawless finishes.', icon: 'gem' },
+          { title: 'Free Shipping', description: 'Complimentary shipping on orders over $99 on all store items.', icon: 'truck' },
         ]}
       />
 
@@ -92,10 +93,10 @@ export default function BilaBeautyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              'https://i0.wp.com/bilasbeauty.com/wp-content/uploads/2026/03/Gemini_Generated_Image_ksry8lksry8lksry.png?fit=844%2C1264&ssl=1',
-              'https://i0.wp.com/bilasbeauty.com/wp-content/uploads/2026/03/Gemini_Generated_Image_663oxq663oxq663o.png?fit=640%2C961&ssl=1',
-              'https://i0.wp.com/bilasbeauty.com/wp-content/uploads/2026/03/Gemini_Generated_Image_qr23t7qr23t7qr23.png?fit=1888%2C2224&ssl=1',
-              'https://i0.wp.com/bilasbeauty.com/wp-content/uploads/2026/03/WhatsApp-Image-2026-03-16-at-7.35.22-AM.jpeg?fit=1080%2C719&ssl=1',
+              '/content/beauty/product-1.png',
+              '/content/beauty/product-2.png',
+              '/content/beauty/product-3.png',
+              '/content/beauty/product-4.jpeg',
             ].map((img, index) => (
               <motion.div
                 key={index}
@@ -123,6 +124,8 @@ export default function BilaBeautyPage() {
           </div>
         </div>
       </section>
+
+      <VentureJournal ventureSlug="bilas-beauty" />
 
       <CTASection />
       <Footer />
