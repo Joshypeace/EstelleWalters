@@ -1,123 +1,69 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Edit2, Trash2, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { ResourceManager, StatusBadge, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
+import { ventures } from '@/lib/ventures'
 
-interface Business {
-  id: number
+interface VentureRow extends ResourceItem {
   name: string
-  type: string
+  slug: string
+  tagline: string
+  description: string
+  highlights: string[]
+  url: string
+  site: string
+  logo: string
   status: string
-  revenue: string
-  employees: number
 }
 
-export default function BusinessesPage() {
-  const [businesses] = useState<Business[]>([
-    {
-      id: 1,
-      name: 'Bilas Studio',
-      type: 'Beauty Services',
-      status: 'Active',
-      revenue: '$45K/month',
-      employees: 12,
-    },
-    {
-      id: 2,
-      name: 'Bilas Beauty',
-      type: 'E-commerce',
-      status: 'Active',
-      revenue: '$32K/month',
-      employees: 8,
-    },
-    {
-      id: 3,
-      name: 'ConnetSuppliers',
-      type: 'B2B Network',
-      status: 'Active',
-      revenue: '$28K/month',
-      employees: 5,
-    },
-  ])
+const initialData: VentureRow[] = ventures.map((v) => ({
+  id: v.slug,
+  name: v.name,
+  slug: v.slug,
+  tagline: v.tagline,
+  description: v.description,
+  highlights: v.highlights,
+  url: v.url,
+  site: v.site,
+  logo: v.logo,
+  status: 'Active',
+}))
 
+const columns: ColumnDef<VentureRow>[] = [
+  { key: 'name', label: 'Venture', className: 'font-medium' },
+  { key: 'tagline', label: 'Tagline', render: (r) => <span className="text-muted-foreground">{r.tagline}</span> },
+  {
+    key: 'site',
+    label: 'Website',
+    render: (r) => (
+      <span className="text-accent font-mono text-xs">{r.site.replace(/^https?:\/\//, '')}</span>
+    ),
+  },
+  { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+]
+
+const fields: FieldDef[] = [
+  { key: 'name', label: 'Name' },
+  { key: 'slug', label: 'Slug', placeholder: 'bilas-studio' },
+  { key: 'tagline', label: 'Tagline', full: true },
+  { key: 'description', label: 'Description', type: 'textarea', full: true },
+  { key: 'highlights', label: 'Highlights', type: 'tags', full: true, placeholder: 'Premium Treatments, Expert Consultants' },
+  { key: 'url', label: 'Internal page', placeholder: '/businesses/bilas-studio' },
+  { key: 'site', label: 'External website', placeholder: 'https://bilasstudio.com' },
+  { key: 'logo', label: 'Logo', type: 'image', full: true },
+  { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Hidden'].map((s) => ({ label: s, value: s })) },
+]
+
+export default function AdminVenturesPage() {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h2 className="text-3xl font-serif font-bold text-foreground mb-2">Businesses</h2>
-        <p className="text-muted-foreground">Manage your business portfolios and operations</p>
-      </motion.div>
-
-      {/* Businesses Grid */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ staggerChildren: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
-        {businesses.map((business, i) => (
-          <motion.div
-            key={business.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="bg-card border border-border rounded-lg p-6 hover:border-accent/50 transition group"
-          >
-            {/* Header */}
-            <div className="mb-4">
-              <h3 className="text-lg font-bold text-foreground mb-1">{business.name}</h3>
-              <p className="text-sm text-muted-foreground">{business.type}</p>
-            </div>
-
-            {/* Stats */}
-            <div className="space-y-3 mb-6 pb-6 border-b border-border">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status:</span>
-                <span className="text-sm font-semibold text-green-400">{business.status}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Monthly Revenue:</span>
-                <span className="text-sm font-semibold text-accent">{business.revenue}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Team Size:</span>
-                <span className="text-sm font-semibold text-foreground">{business.employees}</span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 text-accent hover:text-accent/80 transition text-sm font-medium"
-              >
-                <ExternalLink size={16} />
-                View
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-accent hover:text-accent/80 transition ml-auto"
-              >
-                <Edit2 size={18} />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-muted-foreground hover:text-destructive transition"
-              >
-                <Trash2 size={18} />
-              </motion.button>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-    </div>
+    <ResourceManager<VentureRow>
+      title="Ventures"
+      description="Manage the venture cards and the content of each venture detail page."
+      singular="Venture"
+      columns={columns}
+      fields={fields}
+      initialData={initialData}
+      searchKeys={['name', 'tagline']}
+      makeEmpty={() => ({ status: 'Active' })}
+    />
   )
 }
