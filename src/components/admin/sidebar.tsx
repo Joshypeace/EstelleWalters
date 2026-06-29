@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -16,11 +17,13 @@ import {
   LayoutTemplate,
   Sparkles,
   Settings,
+  ShieldCheck,
+  ExternalLink,
   LogOut,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
-  onLogout: () => void
+  isAdmin?: boolean
 }
 
 interface NavItem {
@@ -32,6 +35,7 @@ interface NavItem {
 interface NavGroup {
   heading?: string
   items: NavItem[]
+  adminOnly?: boolean
 }
 
 const navGroups: NavGroup[] = [
@@ -59,10 +63,16 @@ const navGroups: NavGroup[] = [
       { icon: Settings, label: 'Settings', href: '/admin/settings' },
     ],
   },
+  {
+    heading: 'Admin',
+    adminOnly: true,
+    items: [{ icon: ShieldCheck, label: 'Users & Access', href: '/admin/users' }],
+  },
 ]
 
-export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
+export default function AdminSidebar({ isAdmin = false }: AdminSidebarProps) {
   const pathname = usePathname()
+  const groups = navGroups.filter((g) => !g.adminOnly || isAdmin)
 
   return (
     <motion.aside
@@ -78,8 +88,8 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-6">
-        {navGroups.map((group, gi) => (
+      <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+        {groups.map((group, gi) => (
           <div key={gi} className="space-y-1">
             {group.heading && (
               <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -113,10 +123,18 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         ))}
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-border">
+      {/* Footer actions */}
+      <div className="p-4 border-t border-border space-y-1">
+        <Link
+          href="/"
+          target="_blank"
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-foreground hover:bg-secondary rounded-lg transition text-sm font-medium"
+        >
+          <ExternalLink size={18} />
+          View Site
+        </Link>
         <button
-          onClick={onLogout}
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
           className="w-full flex items-center gap-3 px-3 py-2.5 text-destructive hover:bg-destructive/10 rounded-lg transition text-sm font-medium"
         >
           <LogOut size={18} />

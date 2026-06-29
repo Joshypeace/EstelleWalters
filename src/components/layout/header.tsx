@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LayoutDashboard } from 'lucide-react'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 interface NavItem {
   label: string
@@ -20,6 +21,10 @@ const navItems: NavItem[] = [
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const { data: session } = useSession()
+  // Only approved accounts see a way into the dashboard; anonymous visitors
+  // get no sign-in/registration links anywhere on the public site.
+  const showDashboard = session?.user?.approvalStatus === 'APPROVED'
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -50,6 +55,15 @@ export function Header() {
                 {item.label}
               </motion.a>
             ))}
+            {showDashboard && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-1.5 text-sm text-accent hover:text-accent/80 transition-colors"
+              >
+                <LayoutDashboard size={15} />
+                Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -80,6 +94,16 @@ export function Header() {
                 {item.label}
               </a>
             ))}
+            {showDashboard && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-1.5 py-2 text-sm text-accent hover:text-accent/80 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <LayoutDashboard size={15} />
+                Dashboard
+              </Link>
+            )}
           </motion.nav>
         )}
       </div>

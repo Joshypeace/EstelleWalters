@@ -1,17 +1,25 @@
 'use client'
 
-import { AdminUser } from '@/lib/admin-auth'
+import { signOut } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { ChevronDown, LogOut } from 'lucide-react'
 import { useState } from 'react'
+import type { Role } from '@/generated/prisma/enums'
 
 interface AdminHeaderProps {
-  user: AdminUser
-  onLogout: () => void
+  name: string
+  email: string
+  role: Role
 }
 
-export default function AdminHeader({ user, onLogout }: AdminHeaderProps) {
+export default function AdminHeader({ name, email, role }: AdminHeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false)
+
+  const initials = name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
 
   return (
     <header className="bg-card border-b border-border">
@@ -29,16 +37,14 @@ export default function AdminHeader({ user, onLogout }: AdminHeaderProps) {
             className="flex items-center gap-3 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition"
           >
             <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-              <span className="text-accent-foreground font-bold text-sm">
-                {user.name
-                  .split(' ')
-                  .map(n => n[0])
-                  .join('')}
-              </span>
+              <span className="text-accent-foreground font-bold text-sm">{initials}</span>
             </div>
             <div className="text-left">
-              <p className="text-sm font-medium text-foreground">{user.name}</p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
+              <p className="text-sm font-medium text-foreground">{name}</p>
+              <p className="text-xs text-muted-foreground">
+                {email}
+                {role === 'ADMIN' && <span className="ml-1 text-accent">· Admin</span>}
+              </p>
             </div>
             <ChevronDown size={16} className="text-muted-foreground" />
           </motion.button>
@@ -52,7 +58,7 @@ export default function AdminHeader({ user, onLogout }: AdminHeaderProps) {
               className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg"
             >
               <button
-                onClick={onLogout}
+                onClick={() => signOut({ callbackUrl: '/admin/login' })}
                 className="w-full flex items-center gap-3 px-4 py-3 text-destructive hover:bg-destructive/10 rounded-lg transition text-sm font-medium"
               >
                 <LogOut size={16} />

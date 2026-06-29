@@ -1,0 +1,251 @@
+// Prisma 7 schema — query-compiler + driver-adapter model (Neon).
+// The runtime client connects via the Neon adapter in src/server/db.ts;
+// `url`/`directUrl` below are used by the migration/schema engine only.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  // Connection URLs live in prisma.config.ts (Prisma 7). Runtime uses the
+  // Neon adapter (src/server/db.ts); migrations use the direct URL from config.
+  provider = "postgresql"
+}
+
+// ----------------------------------------------------------------------------
+// Auth & users
+// ----------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String?
+  email          String         @unique
+  emailVerified  DateTime?
+  image          String?
+  passwordHash   String? // bcrypt; null for OAuth-only accounts (future)
+  role           Role           @default(EDITOR)
+  approvalStatus ApprovalStatus @default(PENDING)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+}
+
+// NextAuth adapter tables (kept so Google OAuth can be added later w/o migration)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ----------------------------------------------------------------------------
+// Shared
+// ----------------------------------------------------------------------------
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+// ----------------------------------------------------------------------------
+// Content
+// ----------------------------------------------------------------------------
+
+model Venture {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  name        String
+  tagline     String
+  description String        @db.Text
+  highlights  String[] // Postgres text[]
+  url         String // internal page path
+  site        String // external website
+  logoUrl     String
+  status      ContentStatus @default(PUBLISHED)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  journalPosts JournalPost[]
+  teamMembers  TeamMember[]
+  testimonials Testimonial[]
+}
+
+model JournalPost {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  title           String
+  excerpt         String        @db.Text
+  content         String        @db.Text
+  category        String
+  author          String
+  date            String // display string, e.g. "March 15, 2024"
+  readTime        String
+  featuredImageUrl String
+  status          ContentStatus @default(PUBLISHED)
+  sortOrder       Int           @default(0)
+  ventureId       String?
+  venture         Venture?      @relation(fields: [ventureId], references: [id], onDelete: SetNull)
+  gallery         GalleryImage[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model TravelPost {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  excerpt          String        @db.Text
+  content          String        @db.Text
+  country          String
+  category         String
+  date             String
+  readTime         String
+  featuredImageUrl String
+  status           ContentStatus @default(PUBLISHED)
+  sortOrder        Int           @default(0)
+  gallery          GalleryImage[]
+  social           SocialPost[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+// A gallery image belongs to EITHER a journal or a travel post.
+model GalleryImage {
+  id            String       @id @default(cuid())
+  src           String
+  alt           String?
+  caption       String?
+  category      String?
+  sortOrder     Int          @default(0)
+  journalPostId String?
+  travelPostId  String?
+  journalPost   JournalPost? @relation(fields: [journalPostId], references: [id], onDelete: Cascade)
+  travelPost    TravelPost?  @relation(fields: [travelPostId], references: [id], onDelete: Cascade)
+}
+
+enum SocialType {
+  instagram
+  tiktok
+}
+
+model SocialPost {
+  id           String      @id @default(cuid())
+  type         SocialType
+  url          String
+  caption      String?     @db.Text
+  externalId   String? // Instagram postId / TikTok videoId
+  sortOrder    Int         @default(0)
+  travelPostId String?
+  travelPost   TravelPost? @relation(fields: [travelPostId], references: [id], onDelete: Cascade)
+  ventureSlug  String? // gallery pages reference by venture slug (e.g. bilas-studio)
+}
+
+model Reel {
+  id          String   @id @default(cuid())
+  title       String
+  src         String // Blob video URL
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+enum ConnectedStatus {
+  LIVE
+  COMING_SOON
+}
+
+model ConnectedVenture {
+  id          String          @id @default(cuid())
+  name        String
+  description String          @db.Text
+  url         String
+  status      ConnectedStatus @default(LIVE)
+  sortOrder   Int             @default(0)
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  ventureId String?
+  venture   Venture? @relation(fields: [ventureId], references: [id], onDelete: SetNull)
+  sortOrder Int      @default(0)
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  author    String
+  role      String
+  text      String   @db.Text
+  ventureId String?
+  venture   Venture? @relation(fields: [ventureId], references: [id], onDelete: SetNull)
+  sortOrder Int      @default(0)
+}
+
+model MediaAsset {
+  id          String   @id @default(cuid())
+  url         String   @unique // Blob public URL
+  pathname    String // blob pathname, e.g. content/beauty/x.jpg
+  folder      String // derived top-level folder for the gallery filter
+  filename    String
+  contentType String?
+  size        Int?
+  createdAt   DateTime @default(now())
+}
+
+// Flexible page content: one row per page. `data` mirrors the existing nested
+// { sections:[{ title, fields:[{ key, label, kind, value }] }] } admin shape.
+model PageContent {
+  id        String   @id @default(cuid())
+  key       String   @unique // "home" | "about" | "contact" | ...
+  label     String
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  key   String @id // "siteName" | "siteUrl" | "email" | "phone" | "description"
+  value String @db.Text
+}

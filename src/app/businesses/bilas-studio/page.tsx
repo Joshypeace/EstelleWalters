@@ -3,7 +3,7 @@ import { Footer } from '@/components/layout/footer'
 import { HeroBusinessPage } from '@/components/sections/business-hero'
 import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
-import { Testimonials } from '@/components/sections/testimonials'
+import { VentureTestimonials } from '@/components/sections/venture-testimonials'
 import { CTASection } from '@/components/sections/cta'
 import { VentureJournal } from '@/components/sections/venture-journal'
 import { TeamMembers } from '@/components/sections/team-members'
@@ -99,31 +99,7 @@ export default function BilasStudioPage() {
           },
         ]}
       />
-      <Testimonials
-        title="What Our Clients Say"
-        testimonials={[
-          {
-            text: 'I absolutely love what the ladies did on my hair. They did an amazing job! Too good!',
-            author: 'Dream Cube',
-            role: 'Customer',
-          },
-          {
-            text: 'Taking beauty to another level. I love that your beauty styles are international standard and professional. Keep changing the looks of these women out there, great job.',
-            author: 'Oimops W.',
-            role: 'Customer',
-          },
-          {
-            text: 'Bilas Studio always comes through, highly recommend for your next cut and fade.',
-            author: 'Mai Aka',
-            role: 'Customer',
-          },
-          {
-            text: 'Got my hair done today. Thank you for the relaxing and customer service was excellent. Will be coming back for sure. Keep up the good work, God bless always.',
-            author: 'Bilas Customer',
-            role: 'Loyal Client',
-          },
-        ]}
-      />
+      <VentureTestimonials ventureSlug="bilas-studio" title="What Our Clients Say" />
       
       <TeamMembers members={teamMembers} title="Meet Our Talented Team" />
       

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { SectionHeader } from '@/components/ui/luxury-card'
-import { getJournalPostsByVenture } from '@/lib/journal'
+import { trpc } from '@/trpc/react'
 
 interface VentureJournalProps {
   ventureSlug: string
@@ -18,7 +18,7 @@ export function VentureJournal({
   title = 'From the Journal',
   subtitle = 'Stories and insights connected to this venture',
 }: VentureJournalProps) {
-  const posts = getJournalPostsByVenture(ventureSlug)
+  const { data: posts = [] } = trpc.journal.byVenture.useQuery({ ventureSlug })
 
   if (posts.length === 0) return null
 

@@ -4,7 +4,17 @@ import { motion } from 'framer-motion'
 import { PremiumButton } from '@/components/ui/premium-button'
 import { Mail, Phone } from 'lucide-react'
 
-export function CTASection() {
+interface CTASectionProps {
+  heading?: string
+  body?: string
+  buttonLabel?: string
+}
+
+export function CTASection({
+  heading = "Let's Connect",
+  body = "Whether you're interested in collaboration, partnership, or simply want to say hello, I'd love to hear from you.",
+  buttonLabel = 'Send an Email',
+}: CTASectionProps = {}) {
   return (
     <section id="contact" className="py-20 px-4 bg-gradient-to-br from-secondary to-secondary/50">
       <div className="max-w-4xl mx-auto text-center">
@@ -15,11 +25,10 @@ export function CTASection() {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-4xl md:text-5xl font-serif font-semibold mb-6 text-balance">
-            Let&apos;s Connect
+            {heading}
           </h2>
           <p className="text-lg text-muted-foreground mb-12 text-balance">
-            Whether you&apos;re interested in collaboration, partnership, or simply want to say hello, I&apos;d love
-            to hear from you.
+            {body}
           </p>
         </motion.div>
 
@@ -86,7 +95,7 @@ export function CTASection() {
             size="lg"
             icon={<Mail size={18} />}
           >
-            Send an Email
+            {buttonLabel}
           </PremiumButton>
           <PremiumButton variant="outline" size="lg">
             Schedule a Call

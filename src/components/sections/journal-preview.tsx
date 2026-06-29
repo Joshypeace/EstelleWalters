@@ -6,34 +6,15 @@ import { PremiumButton } from '@/components/ui/premium-button'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { containerVariants } from '@/lib/animations'
 
-export function JournalPreview() {
-  const articles = [
-    {
-      title: 'The Art of Luxury Beauty in Modern Times',
-      excerpt:
-        'Exploring how craftsmanship and innovation come together to create beauty experiences that transcend the ordinary.',
-      date: 'March 15, 2024',
-      category: 'Beauty',
-      slug: 'luxury-beauty',
-    },
-    {
-      title: 'Building Global Connections in Trade',
-      excerpt:
-        'Insights from connecting suppliers and distributors across international markets and breaking down silos.',
-      date: 'March 8, 2024',
-      category: 'Business',
-      slug: 'global-trade',
-    },
-    {
-      title: 'Wellness Philosophy: Beyond the Surface',
-      excerpt:
-        'A deep dive into holistic wellness, sustainability, and the importance of mindful beauty practices.',
-      date: 'February 28, 2024',
-      category: 'Wellness',
-      slug: 'wellness-philosophy',
-    },
-  ]
+export interface JournalPreviewItem {
+  title: string
+  excerpt: string
+  date: string
+  category: string
+  slug: string
+}
 
+export function JournalPreview({ articles }: { articles: JournalPreviewItem[] }) {
   return (
     <section className="py-20 px-4 bg-secondary/30">
       <div className="max-w-6xl mx-auto">
@@ -86,7 +67,7 @@ export function JournalPreview() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex justify-center mt-12"
         >
-          <PremiumButton href="#journal" variant="secondary" size="lg">
+          <PremiumButton href="/journal" variant="secondary" size="lg">
             Read All Articles
           </PremiumButton>
         </motion.div>
