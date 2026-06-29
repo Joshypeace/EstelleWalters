@@ -8,6 +8,7 @@ import { reelRouter } from './routers/reel'
 import { connectedVentureRouter } from './routers/connectedVenture'
 import { pageRouter } from './routers/page'
 import { settingRouter } from './routers/setting'
+import { mediaRouter } from './routers/media'
 
 /**
  * Root tRPC router. Each content type the dashboard manages has its own router.
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   connectedVenture: connectedVentureRouter,
   page: pageRouter,
   setting: settingRouter,
+  media: mediaRouter,
 })
 
 export type AppRouter = typeof appRouter

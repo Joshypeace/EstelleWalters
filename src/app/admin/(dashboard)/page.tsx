@@ -36,12 +36,13 @@ export default function AdminDashboard() {
   const { data: journalPosts = [] } = trpc.journal.list.useQuery()
   const { data: travelPosts = [] } = trpc.travel.list.useQuery()
   const { data: ventures = [] } = trpc.venture.list.useQuery()
+  const { data: media = [] } = trpc.media.list.useQuery()
 
   const stats = [
     { icon: FileText, label: 'Journal Posts', value: String(journalPosts.length), href: '/admin/journal', color: 'bg-blue-500/20 text-blue-400' },
     { icon: Plane, label: 'Travel Stories', value: String(travelPosts.length), href: '/admin/travel', color: 'bg-emerald-500/20 text-emerald-400' },
     { icon: Briefcase, label: 'Ventures', value: String(ventures.length), href: '/admin/businesses', color: 'bg-purple-500/20 text-purple-400' },
-    { icon: ImageIcon, label: 'Media Assets', value: '—', href: '/admin/media', color: 'bg-orange-500/20 text-orange-400' },
+    { icon: ImageIcon, label: 'Media Assets', value: String(media.length), href: '/admin/media', color: 'bg-orange-500/20 text-orange-400' },
   ]
 
   return (
