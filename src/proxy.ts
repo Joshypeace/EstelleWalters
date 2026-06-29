@@ -1,27 +1,19 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { auth } from '../src/server/auth'
 
-// Next.js 16 renamed `middleware` to `proxy`. This is a lightweight, fast
-// redirect for unauthenticated visitors hitting the dashboard — it only checks
-// for the presence of a session cookie. The authoritative role/approval checks
-// live in the dashboard layout (auth()) and in protected tRPC procedures.
-const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/register']
-
-export function proxy(request: NextRequest) {
+export async function proxy(request: any) {
   const { pathname } = request.nextUrl
 
-  if (PUBLIC_ADMIN_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+  const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/register']
+
+  if (PUBLIC_ADMIN_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next()
   }
 
-  // Auth.js v5 session cookie name (dev vs. secure prod variant).
-  const hasSession =
-    request.cookies.has('authjs.session-token') ||
-    request.cookies.has('__Secure-authjs.session-token')
+  const session = await auth()
 
-  if (!hasSession) {
-    const url = new URL('/admin/login', request.url)
-    return NextResponse.redirect(url)
+  if (!session?.user) {
+    return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   return NextResponse.next()
