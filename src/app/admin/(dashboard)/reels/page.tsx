@@ -17,7 +17,7 @@ const columns: ColumnDef<ReelRow>[] = [
 
 const fields: FieldDef[] = [
   { key: 'title', label: 'Title', full: true },
-  { key: 'src', label: 'Video URL', full: true, placeholder: 'https://…/travel-1.mp4 or pick from Media' },
+  { key: 'src', label: 'Video', type: 'video', full: true, placeholder: 'https://…/travel-1.mp4 or upload' },
   { key: 'description', label: 'Description', type: 'textarea', full: true },
 ]
 

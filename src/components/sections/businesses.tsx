@@ -8,15 +8,19 @@ import { ArrowUpRight, ExternalLink } from 'lucide-react'
 import { containerVariants } from '@/lib/animations'
 import type { Venture } from '@/lib/ventures'
 
-export function BusinessesSection({ businesses }: { businesses: Venture[] }) {
+export function BusinessesSection({
+  businesses,
+  title = 'My Ventures',
+  subtitle = 'Three distinct brands, unified by a commitment to excellence and luxury',
+}: {
+  businesses: Venture[]
+  title?: string
+  subtitle?: string
+}) {
   return (
     <section id="businesses" className="py-20 px-4 bg-background">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          title="My Ventures"
-          subtitle="Three distinct brands, unified by a commitment to excellence and luxury"
-          centered
-        />
+        <SectionHeader title={title} subtitle={subtitle} centered />
 
         {/* Businesses Grid */}
         <motion.div

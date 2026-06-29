@@ -67,7 +67,7 @@ export function JournalPreview({ articles }: { articles: JournalPreviewItem[] })
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex justify-center mt-12"
         >
-          <PremiumButton href="#journal" variant="secondary" size="lg">
+          <PremiumButton href="/journal" variant="secondary" size="lg">
             Read All Articles
           </PremiumButton>
         </motion.div>

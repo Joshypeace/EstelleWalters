@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit2, Trash2, Search, X, Save } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { UploadButton } from '@/components/admin/upload-button'
 
 /* ----------------------------------------------------------------------------
  * Primitives
@@ -94,6 +95,7 @@ export type FieldType =
   | 'tags'
   | 'image'
   | 'imagelist'
+  | 'video'
 
 export interface FieldDef {
   key: string
@@ -217,10 +219,26 @@ export function FormField({
             <input
               type="text"
               value={(value as string) ?? ''}
-              placeholder={field.placeholder ?? '/content/...'}
+              placeholder={field.placeholder ?? '/content/... or upload'}
               onChange={(e) => onChange(e.target.value)}
               className={inputClass}
             />
+            <UploadButton accept="image/*" onUploaded={(urls) => onChange(urls[0])} />
+          </div>
+        </FieldShell>
+      )
+    case 'video':
+      return (
+        <FieldShell field={field}>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={(value as string) ?? ''}
+              placeholder={field.placeholder ?? 'https://…/video.mp4 or upload'}
+              onChange={(e) => onChange(e.target.value)}
+              className={inputClass}
+            />
+            <UploadButton accept="video/*" onUploaded={(urls) => onChange(urls[0])} />
           </div>
         </FieldShell>
       )
@@ -228,20 +246,27 @@ export function FormField({
       const arr = Array.isArray(value) ? (value as string[]) : []
       return (
         <FieldShell field={field}>
-          <textarea
-            value={arr.join('\n')}
-            placeholder={field.placeholder ?? 'One image path per line'}
-            rows={4}
-            onChange={(e) =>
-              onChange(
-                e.target.value
-                  .split('\n')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              )
-            }
-            className={cn(inputClass, 'font-mono text-sm')}
-          />
+          <div className="flex items-start gap-3">
+            <textarea
+              value={arr.join('\n')}
+              placeholder={field.placeholder ?? 'One image path per line, or upload'}
+              rows={4}
+              onChange={(e) =>
+                onChange(
+                  e.target.value
+                    .split('\n')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                )
+              }
+              className={cn(inputClass, 'font-mono text-sm')}
+            />
+            <UploadButton
+              accept="image/*"
+              multiple
+              onUploaded={(urls) => onChange([...arr, ...urls])}
+            />
+          </div>
           {arr.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {arr.map((s, i) => (

@@ -1,9 +1,9 @@
-import { getPublishedTravelPosts } from '@/server/queries'
+import { getPublishedTravelPosts, getReels } from '@/server/queries'
 import { TravelPageView } from './travel-page-view'
 
 export const dynamic = 'force-dynamic'
 
 export default async function TravelPage() {
-  const posts = await getPublishedTravelPosts()
-  return <TravelPageView posts={posts} />
+  const [posts, reels] = await Promise.all([getPublishedTravelPosts(), getReels()])
+  return <TravelPageView posts={posts} reels={reels} />
 }

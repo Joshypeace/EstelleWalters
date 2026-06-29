@@ -5,7 +5,17 @@ import { PremiumButton } from '@/components/ui/premium-button'
 import { ArrowDown } from 'lucide-react'
 import Image from 'next/image'
 
-export function HeroSection() {
+interface HeroSectionProps {
+  eyebrow?: string
+  title?: string
+  subtitle?: string
+}
+
+export function HeroSection({
+  eyebrow = 'Welcome to',
+  title = 'Estelle',
+  subtitle = 'Entrepreneur, beauty visionary, and architect of luxury experiences across three continents.',
+}: HeroSectionProps = {}) {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 px-4">
       {/* Background image */}
@@ -28,13 +38,13 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-6">
-            Welcome to
+            {eyebrow}
           </p>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-balance mb-6 leading-tight">
-            Estelle<span className="text-accent">.</span>
+            {title}<span className="text-accent">.</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground text-balance max-w-2xl mx-auto mb-8 leading-relaxed">
-            Entrepreneur, beauty visionary, and architect of luxury experiences across three continents.
+            {subtitle}
           </p>
         </motion.div>
 

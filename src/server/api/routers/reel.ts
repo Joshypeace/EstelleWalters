@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc'
 
 const reelFields = z.object({
   title: z.string().min(1),
@@ -11,6 +11,12 @@ export const reelRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     const rows = await ctx.db.reel.findMany({ orderBy: { sortOrder: 'asc' } })
     return rows.map((r) => ({ id: r.id, title: r.title, src: r.src, description: r.description ?? '' }))
+  }),
+
+  // Public: reels shown in the Travel page video showcase.
+  publicList: publicProcedure.query(async ({ ctx }) => {
+    const rows = await ctx.db.reel.findMany({ orderBy: { sortOrder: 'asc' } })
+    return rows.map((r) => ({ title: r.title, src: r.src, description: r.description ?? '' }))
   }),
 
   create: protectedProcedure.input(reelFields).mutation(async ({ ctx, input }) => {

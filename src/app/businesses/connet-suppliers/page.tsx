@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/footer'
 import { HeroBusinessPage } from '@/components/sections/business-hero'
 import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
-import { Testimonials } from '@/components/sections/testimonials'
+import { VentureTestimonials } from '@/components/sections/venture-testimonials'
 import { CTASection } from '@/components/sections/cta'
 import { VentureJournal } from '@/components/sections/venture-journal'
 import { PhotoGallery } from '@/components/ui/photo-gallery'
@@ -81,14 +81,7 @@ export default function ConnetSuppliersPage() {
           { title: 'Supplier Network', description: 'Access to vetted suppliers across multiple industries and regions in China and beyond.', icon: 'globe' },
         ]}
       />
-      <Testimonials
-        title="Partner Testimonials"
-        testimonials={[
-          { text: 'ConnetSuppliers transformed how we source internationally. The connections are genuine and the process is seamless.', author: 'Marco V.', role: 'Import/Export Manager' },
-          { text: 'Finally found reliable suppliers through their vetted network. Business growth accelerated significantly.', author: 'Chen L.', role: 'Distributor' },
-          { text: 'The platform takes the complexity out of global trade. Highly professional team.', author: 'Hassan M.', role: 'Supply Chain Director' },
-        ]}
-      />
+      <VentureTestimonials ventureSlug="connet-suppliers" title="Partner Testimonials" />
 
       <SocialGallery posts={conneteContent} title="Connet in Action" />
 

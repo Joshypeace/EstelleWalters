@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/footer'
 import { HeroBusinessPage } from '@/components/sections/business-hero'
 import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
-import { Testimonials } from '@/components/sections/testimonials'
+import { VentureTestimonials } from '@/components/sections/venture-testimonials'
 import { CTASection } from '@/components/sections/cta'
 import { VentureJournal } from '@/components/sections/venture-journal'
 import { PhotoGallery } from '@/components/ui/photo-gallery'
@@ -67,14 +67,7 @@ export default function BilaBeautyPage() {
         </div>
       </section>
 
-      <Testimonials
-        title="Customer Reviews"
-        testimonials={[
-          { text: 'The quality and selection are unmatched. Every product feels luxurious and truly works.', author: 'Victoria T.', role: 'Beauty Enthusiast' },
-          { text: 'Finally a place where beauty products are both effective AND ethically sourced.', author: 'Amanda K.', role: 'Conscious Consumer' },
-          { text: 'Discovered my new favorite brands through Bilas Beauty. Exceptional curation.', author: 'Laura S.', role: 'Skincare Expert' },
-        ]}
-      />
+      <VentureTestimonials ventureSlug="bilas-beauty" title="Customer Reviews" />
 
       {/* Featured Products */}
       <section className="py-20 px-4 bg-secondary/30">

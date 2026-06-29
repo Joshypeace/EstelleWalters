@@ -7,6 +7,7 @@ import { PhotoGallery } from '@/components/ui/photo-gallery'
 import { VideoShowcase } from '@/components/ui/video-showcase'
 import { SocialGallery } from '@/components/ui/social-embeds'
 import type { TravelPost } from '@/lib/travel'
+import type { Reel } from '@/server/queries'
 import { motion } from 'framer-motion'
 import { MapPin, Plane, Camera, Calendar, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
@@ -46,13 +47,7 @@ const travelPhotos = [
   { src: '/content/travel/la-selva-menu.jpg', alt: 'La Selva menu', caption: 'Curated menus in extraordinary settings', category: 'Dining' },
 ]
 
-const travelVideos = [
-  { src: '/content/videos/travel-1.mp4', title: 'Exploring New Horizons', description: 'Highlights from recent travels across continents' },
-  { src: '/content/videos/travel-2.mp4', title: 'Business Meets Adventure', description: 'Where entrepreneurship and exploration intersect' },
-  { src: '/content/videos/travel-3.mp4', title: 'Behind the Scenes', description: 'The real moments between the destinations' },
-]
-
-export function TravelPageView({ posts }: { posts: TravelPost[] }) {
+export function TravelPageView({ posts, reels }: { posts: TravelPost[]; reels: Reel[] }) {
   return (
     <main className="min-h-screen bg-background">
       <Header />
@@ -128,14 +123,16 @@ export function TravelPageView({ posts }: { posts: TravelPost[] }) {
       </section>
 
       {/* Travel Videos */}
-      <section className="py-20 px-4 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <SectionHeader title="Travel Reels" subtitle="Stories in motion from the road" centered />
-          <div className="mt-12">
-            <VideoShowcase videos={travelVideos} />
+      {reels.length > 0 && (
+        <section className="py-20 px-4 bg-background">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader title="Travel Reels" subtitle="Stories in motion from the road" centered />
+            <div className="mt-12">
+              <VideoShowcase videos={reels} />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Travel Stories — managed from the dashboard */}
       <section className="py-20 px-4 bg-secondary/30">

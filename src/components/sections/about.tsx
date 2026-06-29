@@ -5,7 +5,15 @@ import { SectionHeader, LuxuryCard } from '@/components/ui/luxury-card'
 import { containerVariants } from '@/lib/animations'
 import Image from 'next/image'
 
-export function AboutSection() {
+interface AboutSectionProps {
+  heading?: string
+  body?: string
+}
+
+export function AboutSection({
+  heading = 'About Me',
+  body = 'A journey of entrepreneurship, innovation, and refined aesthetics',
+}: AboutSectionProps = {}) {
   const highlights = [
     {
       title: 'Visionary Leadership',
@@ -27,11 +35,7 @@ export function AboutSection() {
   return (
     <section id="about" className="py-20 px-4 bg-gradient-to-b from-background via-background to-secondary/20">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          title="About Me"
-          subtitle="A journey of entrepreneurship, innovation, and refined aesthetics"
-          centered
-        />
+        <SectionHeader title={heading} subtitle={body} centered />
 
         {/* Two-column: photo + text */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 items-center mt-12 mb-16">

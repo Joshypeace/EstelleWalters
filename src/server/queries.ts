@@ -161,3 +161,28 @@ export async function getTravelPostBySlug(slug: string): Promise<TravelPost | nu
   })
   return p ? mapTravel(p) : null
 }
+
+// ---------------- Reels ----------------
+
+export type Reel = { title: string; src: string; description: string }
+
+export async function getReels(): Promise<Reel[]> {
+  const rows = await db.reel.findMany({ orderBy: { sortOrder: 'asc' } })
+  return rows.map((r) => ({ title: r.title, src: r.src, description: r.description ?? '' }))
+}
+
+// ---------------- Page content ----------------
+
+type PageDataShape = { sections: { fields: { key: string; value: string }[] }[] }
+
+// Returns a flat { fieldKey: value } map for the given page key. Field keys are
+// unique within a page (see prisma/seed-data.ts), so flattening is safe.
+export async function getPageContent(key: string): Promise<Record<string, string>> {
+  const row = await db.pageContent.findUnique({ where: { key } })
+  const data = row?.data as PageDataShape | undefined
+  const map: Record<string, string> = {}
+  for (const section of data?.sections ?? []) {
+    for (const field of section.fields) map[field.key] = field.value
+  }
+  return map
+}

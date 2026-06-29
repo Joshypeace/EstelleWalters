@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc'
 import { ventureIdFromSlug } from './_util'
 
 const testimonialFields = z.object({
@@ -23,6 +23,17 @@ export const testimonialRouter = createTRPCRouter({
       text: t.text,
     }))
   }),
+
+  // Public: testimonials for a given venture, shown on the business pages.
+  byVenture: publicProcedure
+    .input(z.object({ ventureSlug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.db.testimonial.findMany({
+        where: { venture: { slug: input.ventureSlug } },
+        orderBy: { sortOrder: 'asc' },
+      })
+      return rows.map((t) => ({ text: t.text, author: t.author, role: t.role }))
+    }),
 
   create: protectedProcedure.input(testimonialFields).mutation(async ({ ctx, input }) => {
     const count = await ctx.db.testimonial.count()
