@@ -1,11 +1,14 @@
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { TravelArticle } from '@/components/sections/travel-article'
-import { getTravelPost, travelPosts } from '@/lib/travel'
+import { getTravelPostBySlug, getPublishedTravelPosts } from '@/server/queries'
 import Link from 'next/link'
 
-export function generateStaticParams() {
-  return travelPosts.map((post) => ({ slug: post.slug }))
+export const dynamic = 'force-dynamic'
+
+export async function generateStaticParams() {
+  const posts = await getPublishedTravelPosts()
+  return posts.map((post) => ({ slug: post.slug }))
 }
 
 export default async function TravelPostPage({
@@ -14,7 +17,7 @@ export default async function TravelPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = getTravelPost(slug)
+  const post = await getTravelPostBySlug(slug)
 
   if (!post) {
     return (

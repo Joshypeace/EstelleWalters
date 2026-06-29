@@ -16,16 +16,7 @@ import {
   Settings,
   ArrowRight,
 } from 'lucide-react'
-import { journalPosts } from '@/lib/journal'
-import { travelPosts } from '@/lib/travel'
-import { ventures } from '@/lib/ventures'
-
-const stats = [
-  { icon: FileText, label: 'Journal Posts', value: String(journalPosts.length), href: '/admin/journal', color: 'bg-blue-500/20 text-blue-400' },
-  { icon: Plane, label: 'Travel Stories', value: String(travelPosts.length), href: '/admin/travel', color: 'bg-emerald-500/20 text-emerald-400' },
-  { icon: Briefcase, label: 'Ventures', value: String(ventures.length), href: '/admin/businesses', color: 'bg-purple-500/20 text-purple-400' },
-  { icon: ImageIcon, label: 'Media Assets', value: '33', href: '/admin/media', color: 'bg-orange-500/20 text-orange-400' },
-]
+import { trpc } from '@/trpc/react'
 
 const sections = [
   { icon: FileText, label: 'Journal', desc: 'Articles & stories', href: '/admin/journal' },
@@ -42,6 +33,17 @@ const sections = [
 ]
 
 export default function AdminDashboard() {
+  const { data: journalPosts = [] } = trpc.journal.list.useQuery()
+  const { data: travelPosts = [] } = trpc.travel.list.useQuery()
+  const { data: ventures = [] } = trpc.venture.list.useQuery()
+
+  const stats = [
+    { icon: FileText, label: 'Journal Posts', value: String(journalPosts.length), href: '/admin/journal', color: 'bg-blue-500/20 text-blue-400' },
+    { icon: Plane, label: 'Travel Stories', value: String(travelPosts.length), href: '/admin/travel', color: 'bg-emerald-500/20 text-emerald-400' },
+    { icon: Briefcase, label: 'Ventures', value: String(ventures.length), href: '/admin/businesses', color: 'bg-purple-500/20 text-purple-400' },
+    { icon: ImageIcon, label: 'Media Assets', value: '—', href: '/admin/media', color: 'bg-orange-500/20 text-orange-400' },
+  ]
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -139,7 +141,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {journalPosts.slice(0, 5).map((p) => (
-                <tr key={p.slug} className="border-b border-border last:border-b-0 hover:bg-accent/5 transition">
+                <tr key={p.id} className="border-b border-border last:border-b-0 hover:bg-accent/5 transition">
                   <td className="px-6 py-4 text-sm text-foreground font-medium">{p.title}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{p.category}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{p.date}</td>

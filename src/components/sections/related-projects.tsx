@@ -6,43 +6,21 @@ import { containerVariants } from '@/lib/animations'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 
-interface Project {
+export interface RelatedProject {
   name: string
   description: string
   url: string
   status?: string
-  color: string
 }
 
-export function RelatedProjects() {
-  const projects: Project[] = [
-    {
-      name: 'Bilas Foundation',
-      description: 'Community impact arm empowering individuals through beauty, education, sports, and youth training.',
-      url: 'https://www.facebook.com/share/1Goe3wntvk/?mibextid=wwXIfr',
-      color: 'from-blue-500/20 to-blue-600/20',
-    },
-    {
-      name: 'Melagirl',
-      description: 'Premium hair extensions brand with tools and accessories for professional and everyday use.',
-      url: 'https://www.facebook.com/share/18Q8cwC7Zg/?mibextid=wwXIfr',
-      color: 'from-purple-500/20 to-purple-600/20',
-    },
-    {
-      name: 'MelaSkn',
-      description: 'Results-driven skincare brand by Estelle Walters featuring turmeric face and body scrub.',
-      url: 'https://www.facebook.com/share/18HJnzTzwD/?mibextid=wwXIfr',
-      color: 'from-yellow-500/20 to-yellow-600/20',
-    },
-    {
-      name: 'Starla Accessories',
-      description: 'Statement gold and vintage-inspired jewelry brand by Estelle Walters.',
-      url: '#',
-      status: 'Coming Soon',
-      color: 'from-amber-500/20 to-amber-600/20',
-    },
-  ]
+const cardColors = [
+  'from-blue-500/20 to-blue-600/20',
+  'from-purple-500/20 to-purple-600/20',
+  'from-yellow-500/20 to-yellow-600/20',
+  'from-amber-500/20 to-amber-600/20',
+]
 
+export function RelatedProjects({ projects }: { projects: RelatedProject[] }) {
   const containerVariant = {
     hidden: { opacity: 0 },
     visible: {
@@ -81,7 +59,7 @@ export function RelatedProjects() {
           {projects.map((project, index) => (
             <motion.div key={index} variants={itemVariant}>
               <Link href={project.url} target="_blank" rel="noopener noreferrer">
-                <div className={`bg-gradient-to-br ${project.color} border border-border rounded-lg p-6 h-full hover:border-accent transition-all duration-300 cursor-pointer group`}>
+                <div className={`bg-gradient-to-br ${cardColors[index % cardColors.length]} border border-border rounded-lg p-6 h-full hover:border-accent transition-all duration-300 cursor-pointer group`}>
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground flex-1 group-hover:text-accent transition-colors">
                       {project.name}

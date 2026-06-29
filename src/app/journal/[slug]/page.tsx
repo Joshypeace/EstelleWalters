@@ -1,11 +1,14 @@
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ArticleContent } from '@/components/sections/article-content'
-import { getJournalPost, journalPosts } from '@/lib/journal'
+import { getJournalPostBySlug, getPublishedJournalPosts } from '@/server/queries'
 import Link from 'next/link'
 
-export function generateStaticParams() {
-  return journalPosts.map((post) => ({ slug: post.slug }))
+export const dynamic = 'force-dynamic'
+
+export async function generateStaticParams() {
+  const posts = await getPublishedJournalPosts()
+  return posts.map((post) => ({ slug: post.slug }))
 }
 
 export default async function ArticlePage({
@@ -14,7 +17,7 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const article = getJournalPost(slug)
+  const article = await getJournalPostBySlug(slug)
 
   if (!article) {
     return (

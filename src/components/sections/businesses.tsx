@@ -6,11 +6,9 @@ import { SectionHeader, LuxuryCard } from '@/components/ui/luxury-card'
 import { PremiumButton } from '@/components/ui/premium-button'
 import { ArrowUpRight, ExternalLink } from 'lucide-react'
 import { containerVariants } from '@/lib/animations'
-import { ventures } from '@/lib/ventures'
+import type { Venture } from '@/lib/ventures'
 
-export function BusinessesSection() {
-  const businesses = ventures
-
+export function BusinessesSection({ businesses }: { businesses: Venture[] }) {
   return (
     <section id="businesses" className="py-20 px-4 bg-background">
       <div className="max-w-6xl mx-auto">

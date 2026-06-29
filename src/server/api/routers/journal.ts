@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc'
 
 const journalFields = z.object({
   title: z.string().min(1),
@@ -101,5 +101,23 @@ export const journalRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.journalPost.delete({ where: { id: input.id } })
       return { ok: true }
+    }),
+
+  // Public: published posts linked to a venture (for the venture pages).
+  byVenture: publicProcedure
+    .input(z.object({ ventureSlug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.db.journalPost.findMany({
+        where: { status: 'PUBLISHED', venture: { slug: input.ventureSlug } },
+        orderBy: { sortOrder: 'asc' },
+      })
+      return rows.map((p) => ({
+        slug: p.slug,
+        title: p.title,
+        excerpt: p.excerpt,
+        date: p.date,
+        category: p.category,
+        featuredImage: p.featuredImageUrl,
+      }))
     }),
 })
