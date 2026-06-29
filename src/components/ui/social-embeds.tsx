@@ -93,7 +93,7 @@ export function YouTubeShortsEmbed({ videoId }: YouTubeShortsEmbedProps) {
 }
 
 // Social Gallery Grid Component
-interface SocialPost {
+export interface SocialPost {
   id: string
   type: 'tiktok' | 'instagram'
   url: string

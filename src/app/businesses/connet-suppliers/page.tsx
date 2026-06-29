@@ -7,6 +7,7 @@ import { BusinessAbout } from '@/components/sections/business-about'
 import { Services } from '@/components/sections/services'
 import { Testimonials } from '@/components/sections/testimonials'
 import { CTASection } from '@/components/sections/cta'
+import { VentureJournal } from '@/components/sections/venture-journal'
 import { PhotoGallery } from '@/components/ui/photo-gallery'
 import { SectionHeader } from '@/components/ui/luxury-card'
 import { SocialGallery } from '@/components/ui/social-embeds'
@@ -39,7 +40,7 @@ export default function ConnetSuppliersPage() {
       <Header />
 
       {/* Logo Section */}
-      <section className="py-8 px-4 bg-secondary/20 border-b border-border">
+      <section className="pt-24 pb-8 px-4 bg-secondary/20 border-b border-border">
         <div className="max-w-6xl mx-auto flex justify-center">
           <Image src="/logos/connet-suppliers.png" alt="Connet Suppliers Logo" width={140} height={140} className="object-contain" />
         </div>
@@ -72,12 +73,12 @@ export default function ConnetSuppliersPage() {
 
       <Services
         services={[
-          { title: 'Sea Freight', description: 'Reliable and cost-effective sea freight for large-scale international shipments from China to Papua New Guinea.', icon: '🚢' },
-          { title: 'Air Freight', description: 'Fast and reliable air freight for urgent international shipments with full follow-up and support.', icon: '✈️' },
-          { title: 'Road Freight', description: 'Efficient road freight services across cities and regions with real-time tracking.', icon: '🚛' },
-          { title: 'Customs Clearance', description: 'Expert documentation and customs expertise for seamless international shipping.', icon: '📋' },
-          { title: 'Sourcing Services', description: 'Strategic product sourcing from verified suppliers with quality assurance.', icon: '🔍' },
-          { title: 'Supplier Network', description: 'Access to vetted suppliers across multiple industries and regions in China and beyond.', icon: '🌐' },
+          { title: 'Sea Freight', description: 'Reliable and cost-effective sea freight for large-scale international shipments from China to Papua New Guinea.', icon: 'ship' },
+          { title: 'Air Freight', description: 'Fast and reliable air freight for urgent international shipments with full follow-up and support.', icon: 'plane' },
+          { title: 'Road Freight', description: 'Efficient road freight services across cities and regions with real-time tracking.', icon: 'truck' },
+          { title: 'Customs Clearance', description: 'Expert documentation and customs expertise for seamless international shipping.', icon: 'clipboard-check' },
+          { title: 'Sourcing Services', description: 'Strategic product sourcing from verified suppliers with quality assurance.', icon: 'search' },
+          { title: 'Supplier Network', description: 'Access to vetted suppliers across multiple industries and regions in China and beyond.', icon: 'globe' },
         ]}
       />
       <Testimonials
@@ -90,6 +91,8 @@ export default function ConnetSuppliersPage() {
       />
 
       <SocialGallery posts={conneteContent} title="Connet in Action" />
+
+      <VentureJournal ventureSlug="connet-suppliers" />
 
       <CTASection />
       <Footer />

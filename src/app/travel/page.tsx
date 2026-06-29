@@ -2,14 +2,15 @@
 
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
-import { SectionHeader, LuxuryCard } from '@/components/ui/luxury-card'
+import { SectionHeader } from '@/components/ui/luxury-card'
 import { PhotoGallery } from '@/components/ui/photo-gallery'
 import { VideoShowcase } from '@/components/ui/video-showcase'
 import { SocialGallery } from '@/components/ui/social-embeds'
-import { containerVariants } from '@/lib/animations'
+import { travelPosts } from '@/lib/travel'
 import { motion } from 'framer-motion'
-import { MapPin, Plane, Camera } from 'lucide-react'
+import { MapPin, Plane, Camera, Calendar, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function TravelPage() {
   const travelContent = [
@@ -118,10 +119,8 @@ export default function TravelPage() {
   ]
 
   const travelPhotos = [
-    { src: '/content/travel/paris-eiffel-tower.jpg', alt: 'Estelle in Paris with Eiffel Tower', caption: 'Paris, France — where every corner inspires', category: 'Paris' },
-    { src: '/content/travel/norway-winter.jpg', alt: 'Winter in Norway', caption: 'Arctic serenity in the Norwegian fjords', category: 'Norway' },
     { src: '/content/travel/norway-mountains.jpg', alt: 'Norwegian mountain landscape', caption: 'Snow-capped mountains and frozen shores', category: 'Norway' },
-    { src: '/content/travel/giraffe-centre-kenya.jpg', alt: 'Giraffe Centre Nairobi', caption: 'Giraffe Centre, Nairobi — up close with nature', category: 'Kenya' },
+    { src: '/content/travel/norway-bridge.jpg', alt: 'Norway bridge crossing', caption: 'Crossing into quiet, open landscapes', category: 'Norway' },
     { src: '/content/travel/karibu-kenya.jpg', alt: 'Karibu Kenya sign', caption: 'Karibu Kenya — welcome to East Africa', category: 'Kenya' },
     { src: '/content/travel/kenya-wildlife.jpg', alt: 'Kenya wildlife experience', caption: 'Exploring Kenya\'s incredible wildlife', category: 'Kenya' },
     { src: '/content/travel/la-selva-dining.jpg', alt: 'Fine dining at La Selva', caption: 'La Selva — where tropical ambiance meets fine cuisine', category: 'Dining' },
@@ -254,33 +253,66 @@ export default function TravelPage() {
         </div>
       </section>
 
-      {/* Travel Stories */}
+      {/* Travel Stories — individual blogs */}
       <section className="py-20 px-4 bg-secondary/30">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader title="Travel Stories" subtitle="Insights from the road" centered />
+          <SectionHeader
+            title="Travel Stories"
+            subtitle="Individual journals from the road — beauty, business, and wonder across the world"
+            centered
+          />
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12"
-          >
-            {[
-              {
-                title: 'Beauty Rituals of the World',
-                excerpt: 'Discovering how different cultures approach beauty, wellness, and self-care reveals universal truths about human connection and the art of transformation.',
-              },
-              {
-                title: 'Global Trade Networks',
-                excerpt: 'Understanding supply chains firsthand — from artisan workshops in Guangzhou to distribution centers in Port Moresby — shaped the vision for ConnetSuppliers.',
-              },
-            ].map((story, index) => (
-              <LuxuryCard key={index} delay={index} hoverable>
-                <h3 className="text-2xl font-serif font-semibold mb-3">{story.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{story.excerpt}</p>
-              </LuxuryCard>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+            {travelPosts.map((post, index) => (
+              <motion.div
+                key={post.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                whileHover={{ y: -4 }}
+                className="bg-card border border-border rounded-lg overflow-hidden transition-colors hover:border-accent/50"
+              >
+                <Link href={`/travel/${post.slug}`} className="block group">
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <Image
+                      src={post.featuredImage}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-white bg-accent/80 px-2 py-0.5 rounded-full">
+                        {post.country}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <p className="text-accent text-xs font-semibold uppercase tracking-wider mb-2">
+                      {post.category}
+                    </p>
+                    <h3 className="text-2xl font-serif font-semibold mb-3 text-balance leading-tight group-hover:text-accent transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">{post.excerpt}</p>
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar size={14} />
+                        {post.date}
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-sm text-accent font-medium">
+                        Read story
+                        <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 

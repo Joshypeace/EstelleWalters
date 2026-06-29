@@ -41,12 +41,6 @@ export function RelatedProjects() {
       status: 'Coming Soon',
       color: 'from-amber-500/20 to-amber-600/20',
     },
-    {
-      name: 'Bilas Talk With Skittles',
-      description: 'Talk platform spotlighting conversations around beauty, business, and personal growth.',
-      url: 'https://www.tiktok.com/@bilastudios',
-      color: 'from-pink-500/20 to-pink-600/20',
-    },
   ]
 
   const containerVariant = {
@@ -82,7 +76,7 @@ export function RelatedProjects() {
           variants={containerVariant}
           initial="hidden"
           whileInView="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-12"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12"
         >
           {projects.map((project, index) => (
             <motion.div key={index} variants={itemVariant}>

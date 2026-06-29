@@ -2,69 +2,21 @@
 
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
-import { SectionHeader, LuxuryCard } from '@/components/ui/luxury-card'
-import { containerVariants } from '@/lib/animations'
+import { journalPosts } from '@/lib/journal'
 import { motion } from 'framer-motion'
 import { Calendar, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function JournalPage() {
-  const articles = [
-    {
-      title: 'The Art of Luxury Beauty in Modern Times',
-      excerpt:
-        'Exploring how craftsmanship and innovation come together to create beauty experiences that transcend the ordinary.',
-      date: 'March 15, 2024',
-      category: 'Beauty',
-      slug: 'luxury-beauty',
-    },
-    {
-      title: 'Building Global Connections in Trade',
-      excerpt:
-        'Insights from connecting suppliers and distributors across international markets and breaking down silos.',
-      date: 'March 8, 2024',
-      category: 'Business',
-      slug: 'global-trade',
-    },
-    {
-      title: 'Wellness Philosophy: Beyond the Surface',
-      excerpt:
-        'A deep dive into holistic wellness, sustainability, and the importance of mindful beauty practices.',
-      date: 'February 28, 2024',
-      category: 'Wellness',
-      slug: 'wellness-philosophy',
-    },
-    {
-      title: 'Travel Diaries: Beauty Rituals Around the World',
-      excerpt:
-        'Discovering beauty traditions and wellness practices across three continents and how they inspire my work.',
-      date: 'February 18, 2024',
-      category: 'Travel',
-      slug: 'travel-beauty',
-    },
-    {
-      title: 'The Future of Entrepreneurship',
-      excerpt:
-        'My vision for the next generation of business leaders and how to build enterprises that matter.',
-      date: 'February 8, 2024',
-      category: 'Business',
-      slug: 'future-entrepreneurship',
-    },
-    {
-      title: 'Sustainability in Beauty Supply Chains',
-      excerpt:
-        'How ethical sourcing and sustainable practices are transforming the global beauty industry.',
-      date: 'January 28, 2024',
-      category: 'Beauty',
-      slug: 'sustainability-beauty',
-    },
-  ]
+  const articles = journalPosts
 
   return (
     <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero */}
-      <section className="min-h-64 flex items-center justify-center pt-20 px-4">
+      <section className="min-h-64 flex items-center justify-center pt-28 pb-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -84,45 +36,55 @@ export default function JournalPage() {
       {/* Articles Grid */}
       <section className="py-20 px-4 bg-gradient-to-b from-background via-background to-secondary/20">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {articles.map((article, index) => (
-              <LuxuryCard key={index} delay={index} hoverable>
-                <div className="flex flex-col justify-between h-full gap-4">
-                  <div>
-                    <p className="text-accent text-xs font-semibold uppercase tracking-wider mb-3">
+              <motion.div
+                key={article.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                whileHover={{ y: -4 }}
+                className="bg-card border border-border rounded-lg overflow-hidden transition-colors hover:border-accent/50"
+              >
+                <Link href={`/journal/${article.slug}`} className="block group">
+                  {/* Featured Image */}
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <Image
+                      src={article.featuredImage}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <span className="absolute top-3 left-3 text-[10px] font-semibold uppercase tracking-wider text-white bg-accent/80 px-2 py-0.5 rounded-full">
                       {article.category}
-                    </p>
-                    <h3 className="text-xl font-serif font-semibold mb-3 text-balance leading-tight">
-                      {article.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
-                      {article.excerpt}
-                    </p>
+                    </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Calendar size={14} />
-                      {article.date}
+                  <div className="flex flex-col justify-between gap-4 p-6">
+                    <div>
+                      <h3 className="text-xl font-serif font-semibold mb-3 text-balance leading-tight group-hover:text-accent transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                        {article.excerpt}
+                      </p>
                     </div>
-                    <motion.a
-                      href={`/journal/${article.slug}`}
-                      whileHover={{ x: 4 }}
-                      transition={{ type: 'spring', stiffness: 300 }}
-                      className="cursor-pointer"
-                    >
-                      <ArrowRight size={16} className="text-accent" />
-                    </motion.a>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar size={14} />
+                        {article.date}
+                      </div>
+                      <ArrowRight size={16} className="text-accent transition-transform group-hover:translate-x-1" />
+                    </div>
                   </div>
-                </div>
-              </LuxuryCard>
+                </Link>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 

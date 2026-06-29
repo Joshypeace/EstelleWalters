@@ -4,39 +4,12 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { SectionHeader, LuxuryCard } from '@/components/ui/luxury-card'
 import { PremiumButton } from '@/components/ui/premium-button'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, ExternalLink } from 'lucide-react'
 import { containerVariants } from '@/lib/animations'
+import { ventures } from '@/lib/ventures'
 
 export function BusinessesSection() {
-  const businesses = [
-    {
-      name: 'Bilas Studio',
-      tagline: 'Luxury Beauty Experiences',
-      description:
-        'An exclusive beauty studio offering personalized treatments, bespoke services, and immersive wellness experiences crafted for discerning clients.',
-      highlights: ['Premium Treatments', 'Expert Consultants', 'Luxury Setting'],
-      url: '/businesses/bilas-studio',
-      logo: '/logos/bilas-studio.jpg',
-    },
-    {
-      name: 'Bilas Beauty',
-      tagline: 'Curated Beauty Products',
-      description:
-        'A carefully curated collection of premium beauty and skincare products sourced from the finest artisans and brands worldwide.',
-      highlights: ['Premium Products', 'Global Sourcing', 'Expert Selection'],
-      url: '/businesses/bilas-beauty',
-      logo: '/logos/bilas-beauty.png',
-    },
-    {
-      name: 'ConnetSuppliers',
-      tagline: 'Global Trade Network',
-      description:
-        'Connecting suppliers and distributors across continents, facilitating seamless international partnerships and transforming supply chains.',
-      highlights: ['B2B Network', 'Strategic Partnerships', 'Global Reach'],
-      url: '/businesses/connet-suppliers',
-      logo: '/logos/connet-suppliers.png',
-    },
-  ]
+  const businesses = ventures
 
   return (
     <section id="businesses" className="py-20 px-4 bg-background">
@@ -87,14 +60,25 @@ export function BusinessesSection() {
                 </ul>
               </div>
 
-              <PremiumButton
-                href={business.url}
-                variant="outline"
-                size="sm"
-                icon={<ArrowUpRight size={16} />}
-              >
-                Explore
-              </PremiumButton>
+              <div className="flex flex-wrap items-center gap-3">
+                <PremiumButton
+                  href={business.url}
+                  variant="outline"
+                  size="sm"
+                  icon={<ArrowUpRight size={16} />}
+                >
+                  Explore
+                </PremiumButton>
+                <PremiumButton
+                  href={business.site}
+                  variant="primary"
+                  size="sm"
+                  external
+                  icon={<ExternalLink size={16} />}
+                >
+                  Visit Site
+                </PremiumButton>
+              </div>
             </LuxuryCard>
           ))}
         </motion.div>
