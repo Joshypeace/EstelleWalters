@@ -2,14 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { Lock, Mail } from 'lucide-react'
-import { authenticateAdmin, storeUser } from '@/lib/admin-auth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('admin@estelle.com')
-  const [password, setPassword] = useState('demo123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -19,15 +20,15 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const user = await authenticateAdmin(email, password)
-      if (user) {
-        storeUser(user)
-        router.push('/admin')
-      } else {
+      const res = await signIn('credentials', { email, password, redirect: false })
+      if (res?.error) {
         setError('Invalid email or password')
+      } else {
+        router.push('/admin')
+        router.refresh()
       }
-    } catch (err) {
-      setError('Authentication failed')
+    } catch {
+      setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -42,21 +43,12 @@ export default function AdminLoginPage() {
         className="w-full max-w-md"
       >
         <div className="bg-card border border-border rounded-lg p-8">
-          {/* Header */}
           <div className="text-center mb-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h1 className="text-3xl font-serif font-bold text-foreground mb-2">Admin Access</h1>
-              <p className="text-muted-foreground text-sm">Estelle Walters Publishing Dashboard</p>
-            </motion.div>
+            <h1 className="text-3xl font-serif font-bold text-foreground mb-2">Admin Access</h1>
+            <p className="text-muted-foreground text-sm">Estelle Walters Publishing Dashboard</p>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Email
@@ -66,15 +58,15 @@ export default function AdminLoginPage() {
                 <input
                   id="email"
                   type="email"
+                  required
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
-                  placeholder="admin@estelle.com"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                 Password
@@ -84,15 +76,15 @@ export default function AdminLoginPage() {
                 <input
                   id="password"
                   type="password"
+                  required
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
                   placeholder="••••••••"
                 />
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -103,7 +95,6 @@ export default function AdminLoginPage() {
               </motion.div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -120,16 +111,12 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Demo Credentials Notice */}
-          <div className="mt-6 p-4 bg-secondary/50 border border-border rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-accent">Demo Credentials:</span>
-              <br />
-              Email: admin@estelle.com
-              <br />
-              Password: demo123
-            </p>
-          </div>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Need an account?{' '}
+            <Link href="/admin/register" className="text-accent hover:underline font-medium">
+              Request access
+            </Link>
+          </p>
         </div>
       </motion.div>
     </div>
