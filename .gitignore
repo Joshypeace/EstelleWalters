@@ -16,3 +16,5 @@ node_modules
 
 # Prisma generated client (regenerated on build via `prisma generate`)
 /src/generated/
+# TypeScript incremental build info
+*.tsbuildinfo
