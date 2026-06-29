@@ -6,6 +6,8 @@ import { teamRouter } from './routers/team'
 import { testimonialRouter } from './routers/testimonial'
 import { reelRouter } from './routers/reel'
 import { connectedVentureRouter } from './routers/connectedVenture'
+import { pageRouter } from './routers/page'
+import { settingRouter } from './routers/setting'
 
 /**
  * Root tRPC router. Each content type the dashboard manages has its own router.
@@ -19,6 +21,8 @@ export const appRouter = createTRPCRouter({
   testimonial: testimonialRouter,
   reel: reelRouter,
   connectedVenture: connectedVentureRouter,
+  page: pageRouter,
+  setting: settingRouter,
 })
 
 export type AppRouter = typeof appRouter
