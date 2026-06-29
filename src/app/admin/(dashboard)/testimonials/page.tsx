@@ -1,7 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
 import { ResourceManager, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
-import { ventures } from '@/lib/ventures'
+import { trpc } from '@/trpc/react'
 
 interface TestimonialRow extends ResourceItem {
   author: string
@@ -10,39 +11,40 @@ interface TestimonialRow extends ResourceItem {
   text: string
 }
 
-// Seeded from testimonials across the venture pages.
-const initialData: TestimonialRow[] = [
-  { author: 'Victoria T.', role: 'Beauty Enthusiast', venture: 'bilas-beauty', text: 'The quality and selection are unmatched. Every product feels luxurious and truly works.' },
-  { author: 'Amanda K.', role: 'Conscious Consumer', venture: 'bilas-beauty', text: 'Finally a place where beauty products are both effective AND ethically sourced.' },
-  { author: 'Dream Cube', role: 'Customer', venture: 'bilas-studio', text: 'I absolutely love what the ladies did on my hair. They did an amazing job! Too good!' },
-  { author: 'Mai Aka', role: 'Customer', venture: 'bilas-studio', text: 'Bilas Studio always comes through, highly recommend for your next cut and fade.' },
-  { author: 'Marco V.', role: 'Import/Export Manager', venture: 'connet-suppliers', text: 'ConnetSuppliers transformed how we source internationally. The connections are genuine and the process is seamless.' },
-  { author: 'Chen L.', role: 'Distributor', venture: 'connet-suppliers', text: 'Finally found reliable suppliers through their vetted network. Business growth accelerated significantly.' },
-].map((t, i) => ({ id: `q${i + 1}`, ...t }))
-
-const ventureOptions = ventures.map((v) => ({ label: v.name, value: v.slug }))
-
-const columns: ColumnDef<TestimonialRow>[] = [
-  { key: 'author', label: 'Author', className: 'font-medium' },
-  { key: 'role', label: 'Role', render: (r) => <span className="text-muted-foreground">{r.role}</span> },
-  {
-    key: 'venture',
-    label: 'Venture',
-    render: (r) => (
-      <span className="text-muted-foreground">{ventures.find((v) => v.slug === r.venture)?.name ?? '—'}</span>
-    ),
-  },
-  { key: 'text', label: 'Quote', render: (r) => <span className="text-muted-foreground line-clamp-1">{r.text}</span> },
-]
-
-const fields: FieldDef[] = [
-  { key: 'author', label: 'Author' },
-  { key: 'role', label: 'Role' },
-  { key: 'venture', label: 'Venture', type: 'select', options: ventureOptions, full: true },
-  { key: 'text', label: 'Quote', type: 'textarea', full: true },
-]
-
 export default function AdminTestimonialsPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.testimonial.list.useQuery()
+  const { data: ventures } = trpc.venture.list.useQuery()
+  const invalidate = () => utils.testimonial.list.invalidate()
+  const create = trpc.testimonial.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.testimonial.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.testimonial.delete.useMutation({ onSuccess: invalidate })
+
+  const ventureName = useMemo(
+    () => new Map((ventures ?? []).map((v) => [v.slug, v.name])),
+    [ventures]
+  )
+  const ventureOptions = (ventures ?? []).map((v) => ({ label: v.name, value: v.slug }))
+  const firstVenture = ventures?.[0]?.slug ?? ''
+
+  const columns: ColumnDef<TestimonialRow>[] = [
+    { key: 'author', label: 'Author', className: 'font-medium' },
+    { key: 'role', label: 'Role', render: (r) => <span className="text-muted-foreground">{r.role}</span> },
+    {
+      key: 'venture',
+      label: 'Venture',
+      render: (r) => <span className="text-muted-foreground">{ventureName.get(r.venture) ?? '—'}</span>,
+    },
+    { key: 'text', label: 'Quote', render: (r) => <span className="text-muted-foreground line-clamp-1">{r.text}</span> },
+  ]
+
+  const fields: FieldDef[] = [
+    { key: 'author', label: 'Author' },
+    { key: 'role', label: 'Role' },
+    { key: 'venture', label: 'Venture', type: 'select', options: ventureOptions, full: true },
+    { key: 'text', label: 'Quote', type: 'textarea', full: true },
+  ]
+
   return (
     <ResourceManager<TestimonialRow>
       title="Testimonials"
@@ -50,9 +52,19 @@ export default function AdminTestimonialsPage() {
       singular="Testimonial"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as TestimonialRow[]}
+      loading={isLoading}
       searchKeys={['author', 'text', 'role']}
-      makeEmpty={() => ({ venture: 'bilas-beauty' })}
+      makeEmpty={() => ({ venture: firstVenture })}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }

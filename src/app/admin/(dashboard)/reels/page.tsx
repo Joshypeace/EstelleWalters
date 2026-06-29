@@ -1,19 +1,13 @@
 'use client'
 
 import { ResourceManager, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
+import { trpc } from '@/trpc/react'
 
 interface ReelRow extends ResourceItem {
   title: string
   src: string
   description: string
 }
-
-// Seeded from the Travel page "Travel Reels" section.
-const initialData: ReelRow[] = [
-  { id: 'r1', title: 'Exploring New Horizons', src: '/content/videos/travel-1.mp4', description: 'Highlights from recent travels across continents' },
-  { id: 'r2', title: 'Business Meets Adventure', src: '/content/videos/travel-2.mp4', description: 'Where entrepreneurship and exploration intersect' },
-  { id: 'r3', title: 'Behind the Scenes', src: '/content/videos/travel-3.mp4', description: 'The real moments between the destinations' },
-]
 
 const columns: ColumnDef<ReelRow>[] = [
   { key: 'title', label: 'Title', className: 'font-medium' },
@@ -23,11 +17,18 @@ const columns: ColumnDef<ReelRow>[] = [
 
 const fields: FieldDef[] = [
   { key: 'title', label: 'Title', full: true },
-  { key: 'src', label: 'Video file path', full: true, placeholder: '/content/videos/travel-1.mp4' },
+  { key: 'src', label: 'Video URL', full: true, placeholder: 'https://…/travel-1.mp4 or pick from Media' },
   { key: 'description', label: 'Description', type: 'textarea', full: true },
 ]
 
 export default function AdminReelsPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.reel.list.useQuery()
+  const invalidate = () => utils.reel.list.invalidate()
+  const create = trpc.reel.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.reel.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.reel.delete.useMutation({ onSuccess: invalidate })
+
   return (
     <ResourceManager<ReelRow>
       title="Travel Reels"
@@ -35,8 +36,18 @@ export default function AdminReelsPage() {
       singular="Reel"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as ReelRow[]}
+      loading={isLoading}
       searchKeys={['title', 'description']}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }

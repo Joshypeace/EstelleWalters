@@ -1,6 +1,7 @@
 'use client'
 
 import { ResourceManager, StatusBadge, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
+import { trpc } from '@/trpc/react'
 
 interface ProjectRow extends ResourceItem {
   name: string
@@ -8,14 +9,6 @@ interface ProjectRow extends ResourceItem {
   url: string
   status: string
 }
-
-// Seeded from the home "Connected Ventures" section (related-projects).
-const initialData: ProjectRow[] = [
-  { id: 'p1', name: 'Bilas Foundation', description: 'Community impact arm empowering individuals through beauty, education, sports, and youth training.', url: 'https://www.facebook.com/share/1Goe3wntvk/?mibextid=wwXIfr', status: 'Live' },
-  { id: 'p2', name: 'Melagirl', description: 'Premium hair extensions brand with tools and accessories for professional and everyday use.', url: 'https://www.facebook.com/share/18Q8cwC7Zg/?mibextid=wwXIfr', status: 'Live' },
-  { id: 'p3', name: 'MelaSkn', description: 'Results-driven skincare brand by Estelle Walters featuring turmeric face and body scrub.', url: 'https://www.facebook.com/share/18HJnzTzwD/?mibextid=wwXIfr', status: 'Live' },
-  { id: 'p4', name: 'Starla Accessories', description: 'Statement gold and vintage-inspired jewelry brand by Estelle Walters.', url: '#', status: 'Coming Soon' },
-]
 
 const columns: ColumnDef<ProjectRow>[] = [
   { key: 'name', label: 'Name', className: 'font-medium' },
@@ -31,6 +24,13 @@ const fields: FieldDef[] = [
 ]
 
 export default function AdminConnectedVenturesPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.connectedVenture.list.useQuery()
+  const invalidate = () => utils.connectedVenture.list.invalidate()
+  const create = trpc.connectedVenture.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.connectedVenture.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.connectedVenture.delete.useMutation({ onSuccess: invalidate })
+
   return (
     <ResourceManager<ProjectRow>
       title="Connected Ventures"
@@ -38,9 +38,19 @@ export default function AdminConnectedVenturesPage() {
       singular="Venture"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as ProjectRow[]}
+      loading={isLoading}
       searchKeys={['name', 'description']}
       makeEmpty={() => ({ status: 'Live' })}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }

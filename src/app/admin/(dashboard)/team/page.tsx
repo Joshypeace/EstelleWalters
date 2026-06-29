@@ -1,7 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
 import { ResourceManager, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
-import { ventures } from '@/lib/ventures'
+import { trpc } from '@/trpc/react'
 
 interface TeamRow extends ResourceItem {
   name: string
@@ -9,44 +10,38 @@ interface TeamRow extends ResourceItem {
   venture: string
 }
 
-// Seeded from the Bilas Studio team section.
-const initialData: TeamRow[] = [
-  { name: 'Estelle Walters', role: 'Founder' },
-  { name: 'Sarah Hemine', role: 'Waigani Studio Manager' },
-  { name: 'Theresa Manu', role: 'Ela Beach Studio Manager' },
-  { name: 'Jessica Tokima', role: 'Senior Hair Dresser' },
-  { name: 'Imelda Kovio', role: 'Spa Therapist' },
-  { name: 'Marie Wailou', role: 'Hair Dresser' },
-  { name: 'Torea Moripi', role: 'Receptionist' },
-  { name: 'Josie Utame', role: 'Hair Dresser' },
-  { name: 'Joe Velena', role: 'Barber' },
-  { name: 'Serah Heau', role: 'Hair Dresser' },
-  { name: 'Bobby Haoda', role: 'Barber' },
-  { name: 'Alice Titus', role: 'Hair Braider' },
-  { name: 'Jazmine Kosi', role: 'Nail Tech & Makeup Artist' },
-].map((m, i) => ({ id: `t${i + 1}`, venture: 'bilas-studio', ...m }))
-
-const ventureOptions = ventures.map((v) => ({ label: v.name, value: v.slug }))
-
-const columns: ColumnDef<TeamRow>[] = [
-  { key: 'name', label: 'Name', className: 'font-medium' },
-  { key: 'role', label: 'Role', render: (r) => <span className="text-muted-foreground">{r.role}</span> },
-  {
-    key: 'venture',
-    label: 'Venture',
-    render: (r) => (
-      <span className="text-muted-foreground">{ventures.find((v) => v.slug === r.venture)?.name ?? '—'}</span>
-    ),
-  },
-]
-
-const fields: FieldDef[] = [
-  { key: 'name', label: 'Name' },
-  { key: 'role', label: 'Role' },
-  { key: 'venture', label: 'Venture', type: 'select', options: ventureOptions, full: true },
-]
-
 export default function AdminTeamPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.team.list.useQuery()
+  const { data: ventures } = trpc.venture.list.useQuery()
+  const invalidate = () => utils.team.list.invalidate()
+  const create = trpc.team.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.team.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.team.delete.useMutation({ onSuccess: invalidate })
+
+  const ventureName = useMemo(
+    () => new Map((ventures ?? []).map((v) => [v.slug, v.name])),
+    [ventures]
+  )
+  const ventureOptions = (ventures ?? []).map((v) => ({ label: v.name, value: v.slug }))
+  const firstVenture = ventures?.[0]?.slug ?? ''
+
+  const columns: ColumnDef<TeamRow>[] = [
+    { key: 'name', label: 'Name', className: 'font-medium' },
+    { key: 'role', label: 'Role', render: (r) => <span className="text-muted-foreground">{r.role}</span> },
+    {
+      key: 'venture',
+      label: 'Venture',
+      render: (r) => <span className="text-muted-foreground">{ventureName.get(r.venture) ?? '—'}</span>,
+    },
+  ]
+
+  const fields: FieldDef[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'role', label: 'Role' },
+    { key: 'venture', label: 'Venture', type: 'select', options: ventureOptions, full: true },
+  ]
+
   return (
     <ResourceManager<TeamRow>
       title="Team"
@@ -54,9 +49,19 @@ export default function AdminTeamPage() {
       singular="Member"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as TeamRow[]}
+      loading={isLoading}
       searchKeys={['name', 'role']}
-      makeEmpty={() => ({ venture: 'bilas-studio' })}
+      makeEmpty={() => ({ venture: firstVenture })}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }
