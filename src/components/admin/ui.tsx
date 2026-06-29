@@ -276,12 +276,14 @@ export function Drawer({
   title,
   onClose,
   onSave,
+  saving = false,
   children,
 }: {
   open: boolean
   title: string
   onClose: () => void
   onSave: () => void
+  saving?: boolean
   children: React.ReactNode
 }) {
   return (
@@ -318,13 +320,18 @@ export function Drawer({
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border">
               <button
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-lg font-medium text-foreground bg-secondary hover:bg-secondary/80 transition"
+                disabled={saving}
+                className="px-5 py-2.5 rounded-lg font-medium text-foreground bg-secondary hover:bg-secondary/80 transition disabled:opacity-50"
               >
                 Cancel
               </button>
-              <PrimaryButton onClick={onSave}>
-                <Save size={18} />
-                Save
+              <PrimaryButton onClick={onSave} className={saving ? 'opacity-70 pointer-events-none' : ''}>
+                {saving ? (
+                  <span className="w-4 h-4 border-2 border-accent-foreground border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save size={18} />
+                )}
+                {saving ? 'Saving...' : 'Save'}
               </PrimaryButton>
             </div>
           </motion.div>
@@ -350,6 +357,25 @@ export interface ColumnDef<T extends ResourceItem> {
   className?: string
 }
 
+export interface ResourceManagerProps<T extends ResourceItem> {
+  title: string
+  description?: string
+  singular: string
+  columns: ColumnDef<T>[]
+  fields: FieldDef[]
+  searchKeys?: string[]
+  makeEmpty?: () => Partial<T>
+  /** Legacy in-memory mode: seed data managed with local state. */
+  initialData?: T[]
+  /** Controlled mode: live data from the server (tRPC). When set, the
+   *  on* handlers persist changes and the parent supplies refreshed data. */
+  data?: T[]
+  loading?: boolean
+  onCreate?: (values: Record<string, unknown>) => Promise<void> | void
+  onUpdate?: (id: string, values: Record<string, unknown>) => Promise<void> | void
+  onDelete?: (id: string) => Promise<void> | void
+}
+
 export function ResourceManager<T extends ResourceItem>({
   title,
   description,
@@ -357,21 +383,20 @@ export function ResourceManager<T extends ResourceItem>({
   columns,
   fields,
   initialData,
+  data,
+  loading = false,
   searchKeys,
   makeEmpty,
-}: {
-  title: string
-  description?: string
-  singular: string
-  columns: ColumnDef<T>[]
-  fields: FieldDef[]
-  initialData: T[]
-  searchKeys?: string[]
-  makeEmpty?: () => Partial<T>
-}) {
-  const [items, setItems] = useState<T[]>(initialData)
+  onCreate,
+  onUpdate,
+  onDelete,
+}: ResourceManagerProps<T>) {
+  const controlled = data !== undefined
+  const [internal, setInternal] = useState<T[]>(initialData ?? [])
+  const items = controlled ? (data as T[]) : internal
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<Record<string, unknown>>({})
 
@@ -405,23 +430,44 @@ export function ResourceManager<T extends ResourceItem>({
     setOpen(true)
   }
 
-  const save = () => {
+  const save = async () => {
+    if (controlled) {
+      try {
+        setSaving(true)
+        if (editingId) await onUpdate?.(editingId, form)
+        else await onCreate?.(form)
+        setOpen(false)
+      } catch (e) {
+        alert((e as Error)?.message ?? 'Could not save. Please try again.')
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+    // Legacy in-memory mode
     if (editingId) {
-      setItems((prev) => prev.map((it) => (it.id === editingId ? ({ ...it, ...form } as T) : it)))
+      setInternal((prev) => prev.map((it) => (it.id === editingId ? ({ ...it, ...form } as T) : it)))
     } else {
       const id =
         typeof crypto !== 'undefined' && 'randomUUID' in crypto
           ? crypto.randomUUID()
           : String(Date.now())
-      setItems((prev) => [{ ...(form as T), id }, ...prev])
+      setInternal((prev) => [{ ...(form as T), id }, ...prev])
     }
     setOpen(false)
   }
 
-  const remove = (row: T) => {
-    if (window.confirm(`Delete this ${singular.toLowerCase()}? This cannot be undone.`)) {
-      setItems((prev) => prev.filter((it) => it.id !== row.id))
+  const remove = async (row: T) => {
+    if (!window.confirm(`Delete this ${singular.toLowerCase()}? This cannot be undone.`)) return
+    if (controlled) {
+      try {
+        await onDelete?.(row.id)
+      } catch (e) {
+        alert((e as Error)?.message ?? 'Could not delete. Please try again.')
+      }
+      return
     }
+    setInternal((prev) => prev.filter((it) => it.id !== row.id))
   }
 
   return (
@@ -449,7 +495,9 @@ export function ResourceManager<T extends ResourceItem>({
           />
         </div>
         <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {filtered.length} {filtered.length === 1 ? singular.toLowerCase() : `${singular.toLowerCase()}s`}
+          {loading
+            ? 'Loading…'
+            : `${filtered.length} ${filtered.length === 1 ? singular.toLowerCase() : `${singular.toLowerCase()}s`}`}
         </span>
       </div>
 
@@ -514,7 +562,15 @@ export function ResourceManager<T extends ResourceItem>({
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <EmptyState message={query ? 'No matches for your search.' : `No ${singular.toLowerCase()}s yet.`} />
+            <EmptyState
+              message={
+                loading
+                  ? 'Loading…'
+                  : query
+                    ? 'No matches for your search.'
+                    : `No ${singular.toLowerCase()}s yet.`
+              }
+            />
           )}
         </div>
       </motion.div>
@@ -525,6 +581,7 @@ export function ResourceManager<T extends ResourceItem>({
         title={editingId ? `Edit ${singular}` : `New ${singular}`}
         onClose={() => setOpen(false)}
         onSave={save}
+        saving={saving}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {fields.map((f) => (

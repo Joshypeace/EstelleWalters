@@ -1,7 +1,7 @@
 'use client'
 
 import { ResourceManager, StatusBadge, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
-import { ventures } from '@/lib/ventures'
+import { trpc } from '@/trpc/react'
 
 interface VentureRow extends ResourceItem {
   name: string
@@ -14,19 +14,6 @@ interface VentureRow extends ResourceItem {
   logo: string
   status: string
 }
-
-const initialData: VentureRow[] = ventures.map((v) => ({
-  id: v.slug,
-  name: v.name,
-  slug: v.slug,
-  tagline: v.tagline,
-  description: v.description,
-  highlights: v.highlights,
-  url: v.url,
-  site: v.site,
-  logo: v.logo,
-  status: 'Active',
-}))
 
 const columns: ColumnDef<VentureRow>[] = [
   { key: 'name', label: 'Venture', className: 'font-medium' },
@@ -54,6 +41,13 @@ const fields: FieldDef[] = [
 ]
 
 export default function AdminVenturesPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.venture.list.useQuery()
+  const invalidate = () => utils.venture.list.invalidate()
+  const create = trpc.venture.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.venture.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.venture.delete.useMutation({ onSuccess: invalidate })
+
   return (
     <ResourceManager<VentureRow>
       title="Ventures"
@@ -61,9 +55,19 @@ export default function AdminVenturesPage() {
       singular="Venture"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as VentureRow[]}
+      loading={isLoading}
       searchKeys={['name', 'tagline']}
       makeEmpty={() => ({ status: 'Active' })}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }

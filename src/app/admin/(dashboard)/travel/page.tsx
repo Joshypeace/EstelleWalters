@@ -1,7 +1,7 @@
 'use client'
 
 import { ResourceManager, StatusBadge, type ColumnDef, type FieldDef, type ResourceItem } from '@/components/admin/ui'
-import { travelPosts } from '@/lib/travel'
+import { trpc } from '@/trpc/react'
 
 interface TravelRow extends ResourceItem {
   title: string
@@ -17,22 +17,6 @@ interface TravelRow extends ResourceItem {
   social: string[]
   content: string
 }
-
-const initialData: TravelRow[] = travelPosts.map((p) => ({
-  id: p.slug,
-  title: p.title,
-  slug: p.slug,
-  country: p.country,
-  category: p.category,
-  date: p.date,
-  readTime: p.readTime,
-  status: 'Published',
-  featuredImage: p.featuredImage,
-  excerpt: p.excerpt,
-  gallery: (p.gallery ?? []).map((g) => g.src),
-  social: (p.social ?? []).map((s) => s.url),
-  content: p.content.trim(),
-}))
 
 const columns: ColumnDef<TravelRow>[] = [
   { key: 'title', label: 'Title', className: 'font-medium' },
@@ -65,6 +49,13 @@ const fields: FieldDef[] = [
 ]
 
 export default function AdminTravelPage() {
+  const utils = trpc.useUtils()
+  const { data, isLoading } = trpc.travel.list.useQuery()
+  const invalidate = () => utils.travel.list.invalidate()
+  const create = trpc.travel.create.useMutation({ onSuccess: invalidate })
+  const update = trpc.travel.update.useMutation({ onSuccess: invalidate })
+  const remove = trpc.travel.delete.useMutation({ onSuccess: invalidate })
+
   return (
     <ResourceManager<TravelRow>
       title="Travel Stories"
@@ -72,9 +63,19 @@ export default function AdminTravelPage() {
       singular="Story"
       columns={columns}
       fields={fields}
-      initialData={initialData}
+      data={(data ?? []) as TravelRow[]}
+      loading={isLoading}
       searchKeys={['title', 'country', 'category']}
       makeEmpty={() => ({ status: 'Draft' })}
+      onCreate={async (v) => {
+        await create.mutateAsync(v as Parameters<typeof create.mutateAsync>[0])
+      }}
+      onUpdate={async (id, v) => {
+        await update.mutateAsync({ id, ...v } as Parameters<typeof update.mutateAsync>[0])
+      }}
+      onDelete={async (id) => {
+        await remove.mutateAsync({ id })
+      }}
     />
   )
 }
